@@ -1,0 +1,96 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<div class="container-fluid vh-100 d-flex justify-content-center align-items-center" style="background:antiquewhite">
+    <div class="row w-50 justify-content-center bg-light rounded p-3">
+
+        <div class="col-12">
+            <h1 style="font-family:cursive">Task List</h1>
+
+            <div class="col d-flex justify-content-between mb-4">
+
+
+                <!-- Aggiunto col-6 per una larghezza limitata -->
+                <input placeholder="Inserisci Task" type="text" class="form-control w-50" @bind="task" @onkeydown=HandleKeyDown autofocus />
+
+
+                <Button Color="ButtonColor.Primary" Class="w-25" @onclick=AddTask>Add</Button>
+
+            </div>
+
+            @foreach (var taskItem in lstTask) {
+
+
+                <div class="col-12 d-flex justify-content-between align-items-center">
+                    <div class="col-6 rounded p-2" style="cursor:pointer; background-color:lavender;" @onclick="@(()=> MarkTaskCompleted(taskItem))">
+
+                        <p class="mb-0" style="@GetTaskStyle(taskItem)">
+                            @taskItem
+                        </p>
+                    </div>
+
+                    <div class="col-6 d-flex justify-content-end">
+
+                        <Icon Name="IconName.Trash" Size="IconSize.x2" Color="IconColor.Danger" style="cursor:pointer" class="ml-auto" @onclick="@(()=> RemoveTask(taskItem ))" />
+
+                    </div>
+
+                </div>
+
+            }
+        </div>
+
+
+    </div>
+</div>
+
+@code {
+
+    List<string> lstTask;
+    string task;
+    private HashSet<string> completedTasks;
+    protected override void OnInitialized() {
+        lstTask = new List<string>();
+        completedTasks = new HashSet<string>();
+
+        base.OnInitialized();
+    }
+
+
+    private void HandleKeyDown(KeyboardEventArgs e) {
+        if (e.Key == "Enter" || e.Key == "F4") {
+
+            AddTask(); // Chiama AddTask quando si preme il tasto Enter
+        }
+    }
+
+
+    private void AddTask() {
+        if (!string.IsNullOrWhiteSpace(task)) {
+            lstTask.Add(task);
+            task = string.Empty;
+
+        }
+
+    }
+
+    private void RemoveTask(string taskToRemove) {
+        lstTask.Remove(taskToRemove);
+    }
+
+
+    private void MarkTaskCompleted(string taskToComplete) {
+        if (completedTasks.Contains(taskToComplete)) {
+            completedTasks.Remove(taskToComplete); // Rimuovi se è già completato
+        }
+        else {
+            completedTasks.Add(taskToComplete); // Aggiungi se non è completato
+        }
+    }
+
+    private string GetTaskStyle(string taskItem) {
+        return completedTasks.Contains(taskItem) ? "color: green; text-decoration: line-through;" : "";
+    }
+
+}
